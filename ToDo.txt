@@ -1,0 +1,19 @@
+Todo (in order of importance):
+    Necessary
+        1) Documentation for the interfaces
+        2) Full testing (naturally occurs as we attempt to use the code)
+        
+    Additional
+        3) Example code
+        4) Allow for PWM even in servo state (i.e. allow PWM at the 50Hz servo frequency)
+        5) Add the 2 J15 GPIO pins to the GPIO code (and change the section headers accordingly)
+        6) Safeguards (there is currently no checking to see if the user called the functions correctly)
+        7) Find the resistors for UART0 (Or remove interface if it is already in use by something else)
+        
+    Extra Additional:
+        8) SPI
+        9) USB OTG
+        
+Considerations:
+    - Should we make this repository a full resource on setting up facedetec/starterware?
+    - Interface change: Change PWM from 0 - 255 to duty cycle (0 - 100)?
