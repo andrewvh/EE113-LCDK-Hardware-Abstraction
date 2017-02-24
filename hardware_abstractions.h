@@ -124,7 +124,7 @@ typedef enum
  *          if the program uses any of the J14 GPIO pins. It sets some registers and stuff so that the pins
  *          can be used.
  *
- * \return  Returns the whatever PSCModuleControl returned.
+ * \return  Returns whatever PSCModuleControl returned.
  */
 int GPIOinit();
 
@@ -293,32 +293,97 @@ static void UART0Isr(void);
 
 
 /*********************************** J15: PWM **************************************/
-/*************** Serial Communication over USB and Direct Hardware *****************/
+/**************************** PWM and Servo Control ********************************/
 
 /**
- *
+ * This section contains functions to abstract the use of the PWM pins. There are two PWM pins:
+ * J15_40 and J15_44. In the following functions, PWM1 refers to J15_40 and PWM2 refers to J15_44.
+ * The PWM pins can also act as servo control pins. The PWM pins are part of the same module, which means
+ * that they will be forced to function as the same type of control (i.e. they are both PWMs or both servos,
+ * there is no mixing of PWM and servo). 
  */
 
+/**
+ * \brief   Initialization code for the PWM pins. This needs to be called at the beginning of the program
+ *          if the program uses any PWM pins. It sets some registers and stuff so that the PWM pins can be used.
+ */
 void PWMandServoInit();
 
+/**
+ * \brief   Sets up the PWM pins
+ *
+ * \param   isServo     A boolean to indicate whether the PWM pins should be set so that
+ *                      the can be used with servos. 
+ *                          true:   PWMs will be initialized for servo control.
+ *                                  The PWM frequency is set to 50Hz which is compatible with 
+ *                                  servos, and the Servo1write and Servo2write functions can 
+ *                                  be used to set the angle.
+ *                          false:  PWMs will be initialized for generic high frequency PWM pins.
+ *                                  The PWM is set at 58.8 kHz and the PWM1write and PWM2write 
+ *                                  functions are used to write the duty cycle.
+ */
 void PWMset(bool isServos);
 
+/**
+ * \brief   This function is used to control the duty cycle of the J15_40 PWM pin. This should be used
+ *          if the PWMs were declared as NOT servos in the PWMset function. Calling this function when
+ *          the PWM pins were declared as servo pins will have undefined behavior.
+ *          
+ * \param   value       The duty cycle of the PWM. This number can be from 0 to 255.
+ */
 void PWM1write(int value);
 
+/**
+ * \brief   This function gets the duty cycle of the J15_40 PWM pin. 
+ *
+ * \return  This function returns a number between 0 and 255.
+ */
 int PWM1getValue();
 
+/**
+ * \brief   This function is used to control the angle of the Servo connected to the J15_40 PWM pin. 
+ *          This should be used only if the PWMs were declared as servos in the PWMset function. 
+ *          Calling this function when the PWM pins were not declared as servo pins will have undefined behavior.
+ */
 void Servo1write(int degrees);
 
+/**
+ * \brief   This function gets the angle of the servo connected to the J15_40 PWM pin. 
+ *
+ * \return  This function returns a number between 0 and 180 degrees.
+ */
 int Servo1getAngle();
 
 //void PWM2set(bool isServo);
 
+/**
+ * \brief   This function is used to control the duty cycle of the J15_44 PWM pin. This should be used
+ *          if the PWMs were declared as NOT servos in the PWMset function. Calling this function when
+ *          the PWM pins were declared as servo pins will have undefined behavior.
+ *          
+ * \param   value       The duty cycle of the PWM. This number can be from 0 to 255.
+ */
 void PWM2write(int value);
 
+/**
+ * \brief   This function gets the duty cycle of the J15_44 PWM pin. 
+ *
+ * \return  This function returns a number between 0 and 255.
+ */
 int PWM2getValue();
 
+/**
+ * \brief   This function is used to control the angle of the Servo connected to the J15_44 PWM pin. 
+ *          This should be used only if the PWMs were declared as servos in the PWMset function. 
+ *          Calling this function when the PWM pins were not declared as servo pins will have undefined behavior.
+ */
 void Servo2write(int degrees);
 
+/**
+ * \brief   This function gets the angle of the servo connected to the J15_44 PWM pin. 
+ *
+ * \return  This function returns a number between 0 and 180 degrees.
+ */
 int Servo2getAngle();
 
 

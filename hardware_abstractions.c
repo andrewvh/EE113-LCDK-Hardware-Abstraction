@@ -868,7 +868,7 @@ static void ConfigureIntUART0(void)
 
 
 /*********************************** J15: PWM **************************************/
-/*************** Serial Communication over USB and Direct Hardware *****************/
+/**************************** PWM and Servo Control ********************************/
 
 #define CLOCK_DIV_VAL       10
 
@@ -1048,7 +1048,6 @@ void PWMset(bool isServo)
                EHRPWM_COMPB_NO_LOAD, EHRPWM_CMPCTL_OVERWR_SH_FL);
 
         /* Configure Action qualifier */
-        /* Toggle when CTR = CMPA OR CMPB */
         EHRPWMConfigureAQActionOnA(SOC_EHRPWM_1_REGS, EHRPWM_AQCTLA_ZRO_EPWMXAHIGH, EHRPWM_AQCTLA_PRD_DONOTHING,
             EHRPWM_AQCTLA_CAU_EPWMXALOW,  EHRPWM_AQCTLA_CAD_DONOTHING,  EHRPWM_AQCTLA_CBU_DONOTHING,
             EHRPWM_AQCTLA_CBD_DONOTHING, EHRPWM_AQSFRC_ACTSFA_DONOTHING);
@@ -1082,12 +1081,11 @@ void PWMset(bool isServo)
     if(!PWM1_Servo_Status)
     {
 
-       /* Load Compare B value */
+        /* Load Compare B value */
         EHRPWMLoadCMPB(SOC_EHRPWM_1_REGS, PWM2_Duty_Cycle_Or_Angle, EHRPWM_SHADOW_WRITE_DISABLE,
                EHRPWM_COMPB_NO_LOAD, EHRPWM_CMPCTL_OVERWR_SH_FL);
 
         /* Configure Action qualifier */
-        /* Toggle when CTR = CMPA OR CMPB */
         EHRPWMConfigureAQActionOnB(SOC_EHRPWM_1_REGS, EHRPWM_AQCTLB_ZRO_EPWMXBHIGH, EHRPWM_AQCTLB_PRD_DONOTHING,
             EHRPWM_AQCTLB_CAU_DONOTHING,  EHRPWM_AQCTLB_CAD_DONOTHING,  EHRPWM_AQCTLB_CBU_EPWMXBLOW,
             EHRPWM_AQCTLB_CBD_DONOTHING, EHRPWM_AQSFRC_ACTSFB_DONOTHING);
@@ -1100,7 +1098,6 @@ void PWMset(bool isServo)
                EHRPWM_COMPB_NO_LOAD, EHRPWM_CMPCTL_OVERWR_SH_FL);
 
         /* Configure Action qualifier */
-        /* Toggle when CTR = CMPA OR CMPB */
         EHRPWMConfigureAQActionOnB(SOC_EHRPWM_1_REGS, EHRPWM_AQCTLB_ZRO_EPWMXBHIGH, EHRPWM_AQCTLB_PRD_DONOTHING,
             EHRPWM_AQCTLB_CAU_DONOTHING,  EHRPWM_AQCTLB_CAD_DONOTHING,  EHRPWM_AQCTLB_CBU_EPWMXBLOW,
             EHRPWM_AQCTLB_CBD_DONOTHING, EHRPWM_AQSFRC_ACTSFB_DONOTHING);
@@ -1123,7 +1120,7 @@ void PWM1write(int value)
         EHRPWMLoadCMPA(SOC_EHRPWM_1_REGS, PWM1_Duty_Cycle_Or_Angle, EHRPWM_SHADOW_WRITE_DISABLE,
                        EHRPWM_COMPA_NO_LOAD, EHRPWM_CMPCTL_OVERWR_SH_FL);
     }
-    else if (255 <= value)
+    else if (value >= 255)
     {
         PWM1_Duty_Cycle_Or_Angle = 255;
 
@@ -1197,7 +1194,7 @@ void PWM2write(int value)
         EHRPWMLoadCMPB(SOC_EHRPWM_1_REGS, PWM2_Duty_Cycle_Or_Angle, EHRPWM_SHADOW_WRITE_DISABLE,
                        EHRPWM_COMPB_NO_LOAD, EHRPWM_CMPCTL_OVERWR_SH_FL);
     }
-    else if (255 <= value)
+    else if (value >= 255)
     {
         PWM2_Duty_Cycle_Or_Angle = 255;
 
