@@ -872,7 +872,7 @@ static void ConfigureIntUART0(void)
 
 #define CLOCK_DIV_VAL       10
 
-#define PULSE_MIN 0.7
+#define PULSE_MIN 0.65
 #define PULSE_MAX 2.4
 
 /* Pin Multiplexing bit mask to select EPWM0A pin */
@@ -1109,41 +1109,88 @@ void PWMset(bool isServo)
 
 void PWM1write(int value)
 {
-    if(value <= 0)
+    if(!PWM1_Servo_Status) // If the PWM was set to a generic PWM (58.8kHz)
     {
-        PWM1_Duty_Cycle_Or_Angle = 0;
+        if(value <= 0)
+        {
+            PWM1_Duty_Cycle_Or_Angle = 0;
 
-        EHRPWMConfigureAQActionOnA(SOC_EHRPWM_1_REGS, EHRPWM_AQCTLA_ZRO_EPWMXALOW, EHRPWM_AQCTLA_PRD_DONOTHING,
-                    EHRPWM_AQCTLA_CAU_EPWMXALOW,  EHRPWM_AQCTLA_CAD_DONOTHING,  EHRPWM_AQCTLA_CBU_DONOTHING,
-                    EHRPWM_AQCTLA_CBD_DONOTHING, EHRPWM_AQSFRC_ACTSFA_DONOTHING);
+            EHRPWMConfigureAQActionOnA(SOC_EHRPWM_1_REGS, EHRPWM_AQCTLA_ZRO_EPWMXALOW, EHRPWM_AQCTLA_PRD_DONOTHING,
+                        EHRPWM_AQCTLA_CAU_EPWMXALOW,  EHRPWM_AQCTLA_CAD_DONOTHING,  EHRPWM_AQCTLA_CBU_DONOTHING,
+                        EHRPWM_AQCTLA_CBD_DONOTHING, EHRPWM_AQSFRC_ACTSFA_DONOTHING);
 
-        EHRPWMLoadCMPA(SOC_EHRPWM_1_REGS, PWM1_Duty_Cycle_Or_Angle, EHRPWM_SHADOW_WRITE_DISABLE,
-                       EHRPWM_COMPA_NO_LOAD, EHRPWM_CMPCTL_OVERWR_SH_FL);
+            EHRPWMLoadCMPA(SOC_EHRPWM_1_REGS, PWM1_Duty_Cycle_Or_Angle, EHRPWM_SHADOW_WRITE_DISABLE,
+                           EHRPWM_COMPA_NO_LOAD, EHRPWM_CMPCTL_OVERWR_SH_FL);
+        }
+        else if (value >= 255)
+        {
+            PWM1_Duty_Cycle_Or_Angle = 255;
+
+            EHRPWMConfigureAQActionOnA(SOC_EHRPWM_1_REGS, EHRPWM_AQCTLA_ZRO_EPWMXAHIGH, EHRPWM_AQCTLA_PRD_DONOTHING,
+                        EHRPWM_AQCTLA_CAU_EPWMXAHIGH,  EHRPWM_AQCTLA_CAD_DONOTHING,  EHRPWM_AQCTLA_CBU_DONOTHING,
+                        EHRPWM_AQCTLA_CBD_DONOTHING, EHRPWM_AQSFRC_ACTSFA_DONOTHING);
+
+            EHRPWMLoadCMPA(SOC_EHRPWM_1_REGS, PWM1_Duty_Cycle_Or_Angle, EHRPWM_SHADOW_WRITE_DISABLE,
+                           EHRPWM_COMPA_NO_LOAD, EHRPWM_CMPCTL_OVERWR_SH_FL);
+
+
+        }
+        else
+        {
+            PWM1_Duty_Cycle_Or_Angle = value;
+
+            EHRPWMConfigureAQActionOnA(SOC_EHRPWM_1_REGS, EHRPWM_AQCTLA_ZRO_EPWMXAHIGH, EHRPWM_AQCTLA_PRD_DONOTHING,
+                        EHRPWM_AQCTLA_CAU_EPWMXALOW,  EHRPWM_AQCTLA_CAD_DONOTHING,  EHRPWM_AQCTLA_CBU_DONOTHING,
+                        EHRPWM_AQCTLA_CBD_DONOTHING, EHRPWM_AQSFRC_ACTSFA_DONOTHING);
+
+            EHRPWMLoadCMPA(SOC_EHRPWM_1_REGS, PWM1_Duty_Cycle_Or_Angle, EHRPWM_SHADOW_WRITE_DISABLE,
+                           EHRPWM_COMPA_NO_LOAD, EHRPWM_CMPCTL_OVERWR_SH_FL);
+
+        }
     }
-    else if (value >= 255)
+    else // If the PWM was set to use the servo frequency of 50Hz
     {
-        PWM1_Duty_Cycle_Or_Angle = 255;
+        float countValue = 0;
+        
+        if(value <= 0)
+        {
+            PWM1_Duty_Cycle_Or_Angle = 0;
+            countValue = 0;
 
-        EHRPWMConfigureAQActionOnA(SOC_EHRPWM_1_REGS, EHRPWM_AQCTLA_ZRO_EPWMXAHIGH, EHRPWM_AQCTLA_PRD_DONOTHING,
-                    EHRPWM_AQCTLA_CAU_EPWMXAHIGH,  EHRPWM_AQCTLA_CAD_DONOTHING,  EHRPWM_AQCTLA_CBU_DONOTHING,
-                    EHRPWM_AQCTLA_CBD_DONOTHING, EHRPWM_AQSFRC_ACTSFA_DONOTHING);
+            EHRPWMConfigureAQActionOnA(SOC_EHRPWM_1_REGS, EHRPWM_AQCTLA_ZRO_EPWMXALOW, EHRPWM_AQCTLA_PRD_DONOTHING,
+                        EHRPWM_AQCTLA_CAU_EPWMXALOW,  EHRPWM_AQCTLA_CAD_DONOTHING,  EHRPWM_AQCTLA_CBU_DONOTHING,
+                        EHRPWM_AQCTLA_CBD_DONOTHING, EHRPWM_AQSFRC_ACTSFA_DONOTHING);
 
-        EHRPWMLoadCMPA(SOC_EHRPWM_1_REGS, PWM1_Duty_Cycle_Or_Angle, EHRPWM_SHADOW_WRITE_DISABLE,
-                       EHRPWM_COMPA_NO_LOAD, EHRPWM_CMPCTL_OVERWR_SH_FL);
+            EHRPWMLoadCMPA(SOC_EHRPWM_1_REGS, countValue, EHRPWM_SHADOW_WRITE_DISABLE,
+                           EHRPWM_COMPA_NO_LOAD, EHRPWM_CMPCTL_OVERWR_SH_FL);
+        }
+        else if (value >= 255)
+        {
+            PWM1_Duty_Cycle_Or_Angle = 255;
+            countValue = 1674;
+
+            EHRPWMConfigureAQActionOnA(SOC_EHRPWM_1_REGS, EHRPWM_AQCTLA_ZRO_EPWMXAHIGH, EHRPWM_AQCTLA_PRD_DONOTHING,
+                        EHRPWM_AQCTLA_CAU_EPWMXAHIGH,  EHRPWM_AQCTLA_CAD_DONOTHING,  EHRPWM_AQCTLA_CBU_DONOTHING,
+                        EHRPWM_AQCTLA_CBD_DONOTHING, EHRPWM_AQSFRC_ACTSFA_DONOTHING);
+
+            EHRPWMLoadCMPA(SOC_EHRPWM_1_REGS, countValue, EHRPWM_SHADOW_WRITE_DISABLE,
+                           EHRPWM_COMPA_NO_LOAD, EHRPWM_CMPCTL_OVERWR_SH_FL);
 
 
-    }
-    else
-    {
-        PWM1_Duty_Cycle_Or_Angle = value;
+        }
+        else
+        {
+            PWM1_Duty_Cycle_Or_Angle = value;
+            countValue = 1.0*PWM1_Duty_Cycle_Or_Angle/255*1674;
 
-        EHRPWMConfigureAQActionOnA(SOC_EHRPWM_1_REGS, EHRPWM_AQCTLA_ZRO_EPWMXAHIGH, EHRPWM_AQCTLA_PRD_DONOTHING,
-                    EHRPWM_AQCTLA_CAU_EPWMXALOW,  EHRPWM_AQCTLA_CAD_DONOTHING,  EHRPWM_AQCTLA_CBU_DONOTHING,
-                    EHRPWM_AQCTLA_CBD_DONOTHING, EHRPWM_AQSFRC_ACTSFA_DONOTHING);
+            EHRPWMConfigureAQActionOnA(SOC_EHRPWM_1_REGS, EHRPWM_AQCTLA_ZRO_EPWMXAHIGH, EHRPWM_AQCTLA_PRD_DONOTHING,
+                        EHRPWM_AQCTLA_CAU_EPWMXALOW,  EHRPWM_AQCTLA_CAD_DONOTHING,  EHRPWM_AQCTLA_CBU_DONOTHING,
+                        EHRPWM_AQCTLA_CBD_DONOTHING, EHRPWM_AQSFRC_ACTSFA_DONOTHING);
 
-        EHRPWMLoadCMPA(SOC_EHRPWM_1_REGS, PWM1_Duty_Cycle_Or_Angle, EHRPWM_SHADOW_WRITE_DISABLE,
-                       EHRPWM_COMPA_NO_LOAD, EHRPWM_CMPCTL_OVERWR_SH_FL);
+            EHRPWMLoadCMPA(SOC_EHRPWM_1_REGS, countValue, EHRPWM_SHADOW_WRITE_DISABLE,
+                           EHRPWM_COMPA_NO_LOAD, EHRPWM_CMPCTL_OVERWR_SH_FL);
 
+        }
     }
 
     return;
@@ -1183,42 +1230,90 @@ int Servo1getAngle()
 
 void PWM2write(int value)
 {
-    if(value <= 0)
+    if (!PWM2_Servo_Status)
     {
-        PWM2_Duty_Cycle_Or_Angle = 0;
+        if(value <= 0)
+        {
+            PWM2_Duty_Cycle_Or_Angle = 0;
 
-        EHRPWMConfigureAQActionOnB(SOC_EHRPWM_1_REGS, EHRPWM_AQCTLB_ZRO_EPWMXBLOW, EHRPWM_AQCTLB_PRD_DONOTHING,
-                    EHRPWM_AQCTLB_CAU_DONOTHING,  EHRPWM_AQCTLB_CAD_DONOTHING,  EHRPWM_AQCTLB_CBU_EPWMXBLOW,
-                    EHRPWM_AQCTLB_CBD_DONOTHING, EHRPWM_AQSFRC_ACTSFB_DONOTHING);
+            EHRPWMConfigureAQActionOnB(SOC_EHRPWM_1_REGS, EHRPWM_AQCTLB_ZRO_EPWMXBLOW, EHRPWM_AQCTLB_PRD_DONOTHING,
+                        EHRPWM_AQCTLB_CAU_DONOTHING,  EHRPWM_AQCTLB_CAD_DONOTHING,  EHRPWM_AQCTLB_CBU_EPWMXBLOW,
+                        EHRPWM_AQCTLB_CBD_DONOTHING, EHRPWM_AQSFRC_ACTSFB_DONOTHING);
 
-        EHRPWMLoadCMPB(SOC_EHRPWM_1_REGS, PWM2_Duty_Cycle_Or_Angle, EHRPWM_SHADOW_WRITE_DISABLE,
-                       EHRPWM_COMPB_NO_LOAD, EHRPWM_CMPCTL_OVERWR_SH_FL);
-    }
-    else if (value >= 255)
-    {
-        PWM2_Duty_Cycle_Or_Angle = 255;
+            EHRPWMLoadCMPB(SOC_EHRPWM_1_REGS, PWM2_Duty_Cycle_Or_Angle, EHRPWM_SHADOW_WRITE_DISABLE,
+                           EHRPWM_COMPB_NO_LOAD, EHRPWM_CMPCTL_OVERWR_SH_FL);
+        }
+        else if (value >= 255)
+        {
+            PWM2_Duty_Cycle_Or_Angle = 255;
 
-        EHRPWMConfigureAQActionOnB(SOC_EHRPWM_1_REGS, EHRPWM_AQCTLB_ZRO_EPWMXBHIGH, EHRPWM_AQCTLB_PRD_DONOTHING,
-                    EHRPWM_AQCTLB_CAU_DONOTHING,  EHRPWM_AQCTLB_CAD_DONOTHING,  EHRPWM_AQCTLB_CBU_EPWMXBHIGH,
-                    EHRPWM_AQCTLB_CBD_DONOTHING, EHRPWM_AQSFRC_ACTSFB_DONOTHING);
+            EHRPWMConfigureAQActionOnB(SOC_EHRPWM_1_REGS, EHRPWM_AQCTLB_ZRO_EPWMXBHIGH, EHRPWM_AQCTLB_PRD_DONOTHING,
+                        EHRPWM_AQCTLB_CAU_DONOTHING,  EHRPWM_AQCTLB_CAD_DONOTHING,  EHRPWM_AQCTLB_CBU_EPWMXBHIGH,
+                        EHRPWM_AQCTLB_CBD_DONOTHING, EHRPWM_AQSFRC_ACTSFB_DONOTHING);
 
-        EHRPWMLoadCMPB(SOC_EHRPWM_1_REGS, PWM2_Duty_Cycle_Or_Angle, EHRPWM_SHADOW_WRITE_DISABLE,
-                       EHRPWM_COMPB_NO_LOAD, EHRPWM_CMPCTL_OVERWR_SH_FL);
+            EHRPWMLoadCMPB(SOC_EHRPWM_1_REGS, PWM2_Duty_Cycle_Or_Angle, EHRPWM_SHADOW_WRITE_DISABLE,
+                           EHRPWM_COMPB_NO_LOAD, EHRPWM_CMPCTL_OVERWR_SH_FL);
 
 
+        }
+        else
+        {
+            PWM2_Duty_Cycle_Or_Angle = value;
+
+            EHRPWMConfigureAQActionOnB(SOC_EHRPWM_1_REGS, EHRPWM_AQCTLB_ZRO_EPWMXBHIGH, EHRPWM_AQCTLB_PRD_DONOTHING,
+                        EHRPWM_AQCTLB_CAU_DONOTHING,  EHRPWM_AQCTLB_CAD_DONOTHING,  EHRPWM_AQCTLB_CBU_EPWMXBLOW,
+                        EHRPWM_AQCTLB_CBD_DONOTHING, EHRPWM_AQSFRC_ACTSFB_DONOTHING);
+
+            EHRPWMLoadCMPB(SOC_EHRPWM_1_REGS, PWM2_Duty_Cycle_Or_Angle, EHRPWM_SHADOW_WRITE_DISABLE,
+                           EHRPWM_COMPB_NO_LOAD, EHRPWM_CMPCTL_OVERWR_SH_FL);
+
+        }
     }
     else
     {
-        PWM2_Duty_Cycle_Or_Angle = value;
+        float countValue;
+        
+        if(value <= 0)
+        {
+            PWM2_Duty_Cycle_Or_Angle = 0;
+            countValue = 0;
 
-        EHRPWMConfigureAQActionOnB(SOC_EHRPWM_1_REGS, EHRPWM_AQCTLB_ZRO_EPWMXBHIGH, EHRPWM_AQCTLB_PRD_DONOTHING,
-                    EHRPWM_AQCTLB_CAU_DONOTHING,  EHRPWM_AQCTLB_CAD_DONOTHING,  EHRPWM_AQCTLB_CBU_EPWMXBLOW,
-                    EHRPWM_AQCTLB_CBD_DONOTHING, EHRPWM_AQSFRC_ACTSFB_DONOTHING);
+            EHRPWMConfigureAQActionOnB(SOC_EHRPWM_1_REGS, EHRPWM_AQCTLB_ZRO_EPWMXBLOW, EHRPWM_AQCTLB_PRD_DONOTHING,
+                        EHRPWM_AQCTLB_CAU_DONOTHING,  EHRPWM_AQCTLB_CAD_DONOTHING,  EHRPWM_AQCTLB_CBU_EPWMXBLOW,
+                        EHRPWM_AQCTLB_CBD_DONOTHING, EHRPWM_AQSFRC_ACTSFB_DONOTHING);
 
-        EHRPWMLoadCMPB(SOC_EHRPWM_1_REGS, PWM2_Duty_Cycle_Or_Angle, EHRPWM_SHADOW_WRITE_DISABLE,
-                       EHRPWM_COMPB_NO_LOAD, EHRPWM_CMPCTL_OVERWR_SH_FL);
+            EHRPWMLoadCMPB(SOC_EHRPWM_1_REGS, countValue, EHRPWM_SHADOW_WRITE_DISABLE,
+                           EHRPWM_COMPB_NO_LOAD, EHRPWM_CMPCTL_OVERWR_SH_FL);
+        }
+        else if (value >= 255)
+        {
+            PWM2_Duty_Cycle_Or_Angle = 255;
+            countValue = 1679;
 
+            EHRPWMConfigureAQActionOnB(SOC_EHRPWM_1_REGS, EHRPWM_AQCTLB_ZRO_EPWMXBHIGH, EHRPWM_AQCTLB_PRD_DONOTHING,
+                        EHRPWM_AQCTLB_CAU_DONOTHING,  EHRPWM_AQCTLB_CAD_DONOTHING,  EHRPWM_AQCTLB_CBU_EPWMXBHIGH,
+                        EHRPWM_AQCTLB_CBD_DONOTHING, EHRPWM_AQSFRC_ACTSFB_DONOTHING);
+
+            EHRPWMLoadCMPB(SOC_EHRPWM_1_REGS, countValue, EHRPWM_SHADOW_WRITE_DISABLE,
+                           EHRPWM_COMPB_NO_LOAD, EHRPWM_CMPCTL_OVERWR_SH_FL);
+
+
+        }
+        else
+        {
+            PWM2_Duty_Cycle_Or_Angle = value;
+            countValue = 1.0*PWM2_Duty_Cycle_Or_Angle/255*1679;
+
+            EHRPWMConfigureAQActionOnB(SOC_EHRPWM_1_REGS, EHRPWM_AQCTLB_ZRO_EPWMXBHIGH, EHRPWM_AQCTLB_PRD_DONOTHING,
+                        EHRPWM_AQCTLB_CAU_DONOTHING,  EHRPWM_AQCTLB_CAD_DONOTHING,  EHRPWM_AQCTLB_CBU_EPWMXBLOW,
+                        EHRPWM_AQCTLB_CBD_DONOTHING, EHRPWM_AQSFRC_ACTSFB_DONOTHING);
+
+            EHRPWMLoadCMPB(SOC_EHRPWM_1_REGS, countValue, EHRPWM_SHADOW_WRITE_DISABLE,
+                           EHRPWM_COMPB_NO_LOAD, EHRPWM_CMPCTL_OVERWR_SH_FL);
+
+        }
     }
+        
 
     return;
 }

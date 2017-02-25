@@ -5,9 +5,8 @@ Todo (in order of importance):
         
     Additional
         3) Example code
-        4) Allow for PWM even in servo state (i.e. allow PWM at the 50Hz servo frequency)
-                a) Possibly increasing servo frequency to 100Hz to smooth out PWM. Servos are said 
-                   to be compatible with frequencies between 40Hz and 200Hz.
+        4) Possibly increasing servo frequency to 100Hz to smooth out PWM. Servos are said 
+           to be compatible with frequencies between 40Hz and 200Hz.
         5) Add the 2 J15 GPIO pins to the GPIO code (and change the section headers accordingly)
         6) Safeguards (there is currently no checking to see if the user called the functions correctly)
         7) Find the resistors for UART0 (Or remove interface if it is already in use by something else)

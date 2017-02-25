@@ -241,6 +241,50 @@ void Servo_1_and_2_test()
     {;}
 }
 
+void PWM1_and_Servo2_test()
+{
+    PWMandServoInit();
+    PWMset(true);
+    int i;
+    while(1)
+    {
+        for(i = 0; i <= 180; i=i+10)
+        {
+            PWM1write(1.0*i/180*255);
+            Servo2write(i);
+            Delay(10000000);
+        }
+        for(i = 180; i >= 0; i=i-10)
+        {
+            PWM1write(1.0*i/180*255);
+            Servo2write(i);
+            Delay(10000000);
+        }
+    }
+}
+
+void PWM2_and_Servo1_test()
+{
+    PWMandServoInit();
+    PWMset(true);
+    int i;
+    while(1)
+    {
+        for(i = 0; i <= 180; i=i+10)
+        {
+            PWM2write(1.0*i/180*255);
+            Servo1write(i);
+            Delay(10000000);
+        }
+        for(i = 180; i >= 0; i=i-10)
+        {
+            PWM2write(1.0*i/180*255);
+            Servo1write(i);
+            Delay(10000000);
+        }
+    }
+}
+
 void main()
 {
 	//call one of the example tests here
