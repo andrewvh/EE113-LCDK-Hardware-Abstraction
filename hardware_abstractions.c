@@ -33,9 +33,21 @@ int GPIOsetPin(PinNumberOnBoard pinNumber, int mode)
 {
     unsigned int savePinmux = 0;
 
-
     switch(pinNumber)
     {
+         /* PIN MUXING
+        ** - To save space on the package size of the processor, it multiplexes separate internal
+        **   functionalities together on the same external pin using 4 bits to distingish the functions.
+        ** 
+        ** - There are 19 pin muxes, each with 32 bits addressable to enable different uses. We are using
+        **   4 bits on each pin. To access the 4 bits that we need to, we appropriately shift the bits to
+        **   the correct spot.
+        **
+        ** - The code below is setting the appropriate bits on each PINMUX register to enable the correct
+        **   functionalities on those pins. This can be explicitly seen in the "Register" window in CCS by
+        **   clicking the appropriate PINMUX register (0-19). Checking this value is a good way to verify
+        **   that you have appropriately selected the correct pin functionality
+        */
     case J14_3:
         /*
         ** Clearing the bit in context and retaining the other bit values
@@ -280,7 +292,7 @@ int GPIOreadPin(PinNumberOnBoard pinNumber)
     return value;
 }
 
-// Just for testing.
+/* Just for testing. */
 void Delay(unsigned int delay)
 {
     while(delay--);
@@ -958,6 +970,10 @@ void PWMandServoInit()
     return;
 }
 
+/* 
+** If the PWM pin is controlling a servo, then isServo should be TRUE (1)
+** If the PWM pin is not controlling a servo, then isServo should be FALSE (0)
+*/
 void PWMset(bool isServo)
 {
     ///////////// For Pin A //////////////
@@ -1108,6 +1124,7 @@ void PWMset(bool isServo)
     return;
 }
 
+/* Writes a PWM value to PWM pin 1A that ranges between 0 and 255 */
 void PWM1write(int value)
 {
     if(!PWM1_Servo_Status) // If the PWM was set to a generic PWM (58.8kHz)
@@ -1202,6 +1219,7 @@ int PWM1getValue()
     return PWM1_Duty_Cycle_Or_Angle;
 }
 
+/* Writes a value to a servo on PWM pin 1A between 0 and 180 degrees */
 void Servo1write(int degrees)
 {
     if(degrees < 0)
@@ -1229,6 +1247,7 @@ int Servo1getAngle()
     return PWM1_Duty_Cycle_Or_Angle;
 }
 
+/* Writes a PWM value to PWM pin 1B that ranges between 0 and 255 */
 void PWM2write(int value)
 {
     if (!PWM2_Servo_Status)
@@ -1324,6 +1343,7 @@ int PWM2getValue()
     return PWM2_Duty_Cycle_Or_Angle;
 }
 
+/* Writes a value to a servo on PWM pin 1B between 0 and 180 degrees */
 void Servo2write(int degrees)
 {
     if(degrees < 0)
