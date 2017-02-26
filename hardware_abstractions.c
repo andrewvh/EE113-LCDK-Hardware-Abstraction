@@ -23,6 +23,7 @@
    at the beginning of the program if it uses any J14 GPIO pins. */
 int GPIOinit()
 {
+    /* The PSC (Power Sleep Controller) needs to be set to "on" for the GPIO pins */
     return PSCModuleControl(SOC_PSC_1_REGS, HW_PSC_GPIO, PSC_POWERDOMAIN_ALWAYS_ON,
              PSC_MDCTL_NEXT_ENABLE);
 }
