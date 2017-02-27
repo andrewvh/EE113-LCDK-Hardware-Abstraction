@@ -29,6 +29,7 @@
 
 /* Call one of the following tests in the main function at the bottom */
 
+/* tests all GPIO pins at once by switching them HIGH/LOW to check voltages easily */
 void GPIO_test_output()
 {
     GPIOinit();
@@ -189,6 +190,7 @@ void UART1_and_UART2_test()
     }
 }
 
+/* Sweeps a servo on J14_40 from 0 to 180 degrees */
 void Servo1_test()
 {
     PWMandServoInit();

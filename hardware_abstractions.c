@@ -970,10 +970,7 @@ void PWMandServoInit()
     return;
 }
 
-/* 
-** If the PWM pin is controlling a servo, then isServo should be TRUE (1)
-** If the PWM pin is not controlling a servo, then isServo should be FALSE (0)
-*/
+
 void PWMset(bool isServo)
 {
     ///////////// For Pin A //////////////

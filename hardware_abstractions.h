@@ -8,7 +8,7 @@
  *          It was made mostly by copying and expanding the code in the
  *          starterware examples. The functions in this file are hopefully
  *          well documented enough and new-user friendly. TI is soooo crappy
- *          with documentation. This code is split into two sections: J14 and J15.
+ *          with documentation for beginners. This code is split into two sections: J14 and J15.
  *          These correspond to the two header pin groups on the LCDK.
  *
  *                                      J14
@@ -23,7 +23,8 @@
  *                                      J15
  *          The J15 headers have special purposes (UART, I2C, SPI). I only tried to
  *          implement the UART serial communication. Go to the section to read more about
- *          this.
+ *          this. J15's VCC is 3.3V.
+
  *          Update: It seems I also tried to implement PWM. Anything to avoid doing my
  *          GE homework. I added it as a new sections "J15: PWM" at the bottom.
  *          Update: I have made it so that the PWM pins can also control servos. I am really
@@ -60,7 +61,8 @@
  * Not all of the J14 pins are GPIO. Those that are available for use are in the enumerated type
  * 'PinNumberOnBoard' where they are given names corresponding to their actual location on the
  * headers. The function documentation will be written here instead of the .c file so
- * that you don't have to keep switching back in forth (any feedback on this decision).
+ * that you don't have to keep switching back and forth. If you want better understanding of
+ * how the functions or register setup work, then documentation will also be written in the .c file
  * I have not implemented any GPIO interrupt capabilities. When I measured the J14 voltages,
  * the GPIOs used 3.3V for digital high.
  */
@@ -68,7 +70,7 @@
 /**
  * Pin modes
  * These will be used as a parameter to the GPIOsetPin function so that you can tell whether you
- * want an pin to be an input or output.
+ * want a pin to be an input or output.
  */
 #define GPIO_OUTPUT 0
 #define GPIO_INPUT 1
@@ -318,14 +320,14 @@ void PWMandServoInit();
  * \brief   Sets up the PWM pins.
  *
  * \param   isServo     A boolean to indicate whether the PWM pins should be set so that
- *                      the can be used with servos. 
+ *                      they can be used with servos. 
  *                          true:   PWM pins will be initialized for servo control.
  *                                  The PWM frequency is set to 50Hz which is compatible with 
  *                                  servos, and the Servo1write and Servo2write functions can 
  *                                  be used to set the angle. PWM1write and PWM2write can still
  *                                  be used for duty cycle, but the frequency of the PWM is still
  *                                  set to 50Hz.
- *                          false:  PWM pins will be initialized for generic high frequency PWM.
+ *                          false:  PWM pins will be initialized for generic, high frequency PWM.
  *                                  The PWM is set at 58.8 kHz and the PWM1write and PWM2write 
  *                                  functions are used to write the duty cycle. Servos cannot be
  *                                  controlled at this frequnency and therefore none of the Servo
