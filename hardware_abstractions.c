@@ -261,6 +261,21 @@ int GPIOsetPin(PinNumberOnBoard pinNumber, int mode)
         HWREG(SOC_SYSCFG_0_REGS + SYSCFG0_PINMUX(11)) =
              ((SYSCFG_PINMUX11_PINMUX11_15_12_GPIO5_12 << SYSCFG_PINMUX11_PINMUX11_15_12_SHIFT) | savePinmux);
         break;
+    case J15_20:
+        savePinmux = (HWREG(SOC_SYSCFG_0_REGS + SYSCFG0_PINMUX(18)) &
+                             ~(SYSCFG_PINMUX18_PINMUX18_31_28));
+
+        HWREG(SOC_SYSCFG_0_REGS + SYSCFG0_PINMUX(18)) =
+             ((SYSCFG_PINMUX18_PINMUX18_31_28_GPIO8_10  << SYSCFG_PINMUX18_PINMUX18_31_28_SHIFT) | savePinmux);
+        break;
+    case J15_16:
+        savePinmux = (HWREG(SOC_SYSCFG_0_REGS + SYSCFG0_PINMUX(18)) &
+                             ~(SYSCFG_PINMUX18_PINMUX18_23_20));
+
+        HWREG(SOC_SYSCFG_0_REGS + SYSCFG0_PINMUX(18)) =
+             ((SYSCFG_PINMUX18_PINMUX18_23_20_GPIO8_12  << SYSCFG_PINMUX18_PINMUX18_23_20_SHIFT) | savePinmux);
+    break;
+
     default:
         break;
     }

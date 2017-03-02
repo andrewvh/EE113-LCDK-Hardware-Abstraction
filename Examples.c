@@ -63,6 +63,8 @@ void GPIO_test_output()
     GPIOsetPin(J14_31, GPIO_OUTPUT);
     GPIOsetPin(J14_32, GPIO_OUTPUT);
     GPIOsetPin(J14_33, GPIO_OUTPUT);
+    GPIOsetPin(J15_16, GPIO_OUTPUT);
+    GPIOsetPin(J15_20, GPIO_OUTPUT);
 
     while(1)
     {
@@ -95,6 +97,8 @@ void GPIO_test_output()
         GPIOwritePin(J14_31, GPIO_PIN_LOW);
         GPIOwritePin(J14_32, GPIO_PIN_LOW);
         GPIOwritePin(J14_33, GPIO_PIN_LOW);
+        GPIOwritePin(J15_16, GPIO_PIN_LOW);
+        GPIOwritePin(J15_20, GPIO_PIN_LOW);
 
         Delay(5000000);
 
@@ -127,6 +131,8 @@ void GPIO_test_output()
         GPIOwritePin(J14_31, GPIO_PIN_HIGH);
         GPIOwritePin(J14_32, GPIO_PIN_HIGH);
         GPIOwritePin(J14_33, GPIO_PIN_HIGH);
+        GPIOwritePin(J15_16, GPIO_PIN_HIGH);
+        GPIOwritePin(J15_20, GPIO_PIN_HIGH);
 
         Delay(5000000);
     }
