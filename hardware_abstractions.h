@@ -2,7 +2,7 @@
  * \file    hardware_abstractions.h
  *
  *  Created on: Feb 17, 2017
- *      Author: Andrew Van Ho
+ *      Authors: Andrew Van Ho, Robert Devlin
  *
  * \brief   This file contains code to abstract the use of the LCDK.
  *          It was made mostly by copying and expanding the code in the
